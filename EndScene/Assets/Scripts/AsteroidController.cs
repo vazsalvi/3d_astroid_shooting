@@ -62,6 +62,7 @@ public class AsteroidController : MonoBehaviour
 
         Vector3 movementVector = new Vector3(0f, 0f, -moveSpeed * Time.deltaTime);
         rb.linearVelocity = movementVector;
+        rb.linearVelocity = new Vector3(0f, 0f, -moveSpeed);
 
         transform.Rotate(randomRotation * Time.deltaTime);
     }

@@ -1,15 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using System.IO;
 using System.Xml.Serialization;
+
 public class SaveManager : MonoBehaviour
 {
     public static SaveManager Instance;
+
     private void Awake()
     {
-        if(Instance == null)
+        if (Instance == null)
         {
             Instance = this;
             Load();
@@ -19,8 +20,8 @@ public class SaveManager : MonoBehaviour
 
     private SaveClass saveClass;
 
-
-    private void ResetValues()
+    // Change the method from private to public
+    public void ResetValues()
     {
         saveClass.gold = 100;
         saveClass.levelsCompleted = -1;
@@ -30,7 +31,7 @@ public class SaveManager : MonoBehaviour
 
     public bool IsSpaceshipowned(int idx)
     {
-        if(saveClass.ownedSpacesips[idx] == 1)
+        if (saveClass.ownedSpacesips[idx] == 1)
         {
             return true;
         }
@@ -112,5 +113,4 @@ public class SaveManager : MonoBehaviour
         StringReader reader = new StringReader(xmlSerialized);
         return xml.Deserialize(reader) as SaveClass;
     }
-
 }

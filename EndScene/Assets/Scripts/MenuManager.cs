@@ -28,7 +28,7 @@ public class MenuManager : MonoBehaviour
 
     private void Update()
     {
-        if(currentSpaceshipPreview != null)
+        if (currentSpaceshipPreview != null)
         {
             currentSpaceshipPreview.transform.Rotate(0f, rotationSpeed * Time.deltaTime, 0f);
         }
@@ -36,20 +36,27 @@ public class MenuManager : MonoBehaviour
 
     private void UpdateSpaceshipPreview()
     {
-        if(currentSpaceshipPreview != null)
+        // Destroy the previous spaceship preview if it exists
+        if (currentSpaceshipPreview != null)
         {
             Destroy(currentSpaceshipPreview);
         }
 
+        // Get the current spaceship prefab from GameManager
         GameObject newSpaceshipPrefab = GameManager.Instance.currentSpaceship;
-        Vector3 startRotationVector = new Vector3(0f, 180f, 0f);
-        currentSpaceshipPreview = Instantiate(newSpaceshipPrefab,Vector3.zero, Quaternion.Euler(startRotationVector));
+        if (newSpaceshipPrefab != null)
+        {
+            // Set the initial rotation for the spaceship preview
+            Vector3 startRotationVector = new Vector3(0f, 180f, 0f);
+            // Instantiate the new spaceship preview
+            currentSpaceshipPreview = Instantiate(newSpaceshipPrefab, Vector3.zero, Quaternion.Euler(startRotationVector));
+        }
     }
 
     private void InitShopButtons()
     {
         int i = 0;
-        foreach(Transform btn in shopButtonsParent)
+        foreach (Transform btn in shopButtonsParent)
         {
             int currentIdx = i;
 
@@ -63,7 +70,7 @@ public class MenuManager : MonoBehaviour
             Button button = btn.GetComponent<Button>();
             button.onClick.AddListener(() => OnShopButtonClicked(currentIdx));
 
-            //check if we own the saceship
+            //check if we own the spaceship
             if (SaveManager.Instance.IsSpaceshipowned(currentIdx))
             {
                 //disable the text element
@@ -93,13 +100,13 @@ public class MenuManager : MonoBehaviour
         }
         else
         {
-            //check if we have enaught gold
-            int constOfSpaceship = GameManager.Instance.spaceshipPrices[idx];
+            //check if we have enough gold
+            int costOfSpaceship = GameManager.Instance.spaceshipPrices[idx];
             int currentGold = SaveManager.Instance.GetGold();
-            if(currentGold >= constOfSpaceship)
+            if (currentGold >= costOfSpaceship)
             {
                 //buy it
-                SaveManager.Instance.RemoveGold(constOfSpaceship);
+                SaveManager.Instance.RemoveGold(costOfSpaceship);
                 SaveManager.Instance.PurchaseSpaceship(idx);
 
                 //update the button
@@ -108,17 +115,14 @@ public class MenuManager : MonoBehaviour
                 Button buttonComponent = clickedBtn.GetComponent<Button>();
                 buttonComponent.image.color = Color.white;
 
-                //selcet the spaceship
+                //select the spaceship
                 GameManager.Instance.ChangeCurrentSpaceship(idx);
                 UpdateSpaceshipPreview();
 
                 //update the gold text
                 UpdateGoldText();
             }
-
-
         }
-        
     }
 
     private void InitLevelButtons()
@@ -126,21 +130,23 @@ public class MenuManager : MonoBehaviour
         int lastLevelCompleted = SaveManager.Instance.GetLevelsCompleted();
 
         int i = 0;
-        foreach(Transform t in levelContainer)
+        foreach (Transform t in levelContainer)
         {
             int currentIdx = i;
             Button button = t.GetComponent<Button>();
-            if(currentIdx <= lastLevelCompleted)
+
+            if (currentIdx <= lastLevelCompleted)
             {
                 //completed level
                 button.onClick.AddListener(() => OnLevelSelect(currentIdx));
                 button.image.color = Color.white;
             }
-            else if(currentIdx == lastLevelCompleted + 1)
+            else if (currentIdx == lastLevelCompleted + 1)
             {
                 //the current level to be completed
                 button.onClick.AddListener(() => OnLevelSelect(currentIdx));
-                button.image.color = Color.green;
+                button.image.color = new Color(0x00 / 255f, 0xEF / 255f, 0xFF / 255f, 1f); // Hex color #00EFFF
+                Debug.Log($"Level {currentIdx} to be completed: setting color to #00EFFF.");
             }
             else
             {
@@ -148,7 +154,7 @@ public class MenuManager : MonoBehaviour
                 button.interactable = false;
                 button.image.color = Color.gray;
             }
-            
+
             i++;
         }
     }
@@ -156,30 +162,33 @@ public class MenuManager : MonoBehaviour
     private void ChangeMenu(MenuType menuType)
     {
         Vector3 newPos;
-        if(menuType == MenuType.Map1Menu)
+        if (menuType == MenuType.Map1Menu)
         {
             newPos = new Vector3(-screenWidth, 0f, 0f);
         }
-        else if(menuType == MenuType.ShopMenu)
+        else if (menuType == MenuType.ShopMenu)
         {
             newPos = new Vector3(screenWidth, 0f, 0f);
         }
-        //defalut
+        else if (menuType == MenuType.GameSetting)
+        {
+            newPos = new Vector3(0f, Screen.height * 1.1f, 0f);
+        }
         else
         {
-            newPos = Vector3.zero;
+            newPos = Vector3.zero; // Default case
         }
 
         StopAllCoroutines();
-        StartCoroutine(ChageMenuAnimation(newPos));
+        StartCoroutine(ChangeMenuAnimation(newPos));
     }
 
-    private IEnumerator ChageMenuAnimation(Vector3 newPos)
+    private IEnumerator ChangeMenuAnimation(Vector3 newPos)
     {
         float elapsed = 0f;
         Vector3 oldPos = menuContainer.anchoredPosition3D;
 
-        while(elapsed <= transitionTime)
+        while (elapsed <= transitionTime)
         {
             elapsed += Time.deltaTime;
             Vector3 currentPos = Vector3.Lerp(oldPos, newPos, elapsed / transitionTime);
@@ -196,7 +205,7 @@ public class MenuManager : MonoBehaviour
         string sceneName = "Level" + levelIdx.ToString();
         SceneManager.LoadScene(sceneName);
     }
-   
+
     public void OnPlayButtonClicked()
     {
         Debug.Log("Play Button Clicked");
@@ -219,6 +228,21 @@ public class MenuManager : MonoBehaviour
         ChangeMenu(MenuType.ShopMenu);
     }
 
+    public void OnSettingButtonClicked()
+    {
+        Debug.Log("Settings Button Clicked");
+        ChangeMenu(MenuType.GameSetting);
+    }
+
+    public void OnResetGameButtonClicked()
+    {
+        Debug.Log("Reset Game Button Clicked");
+        SaveManager.Instance.ResetValues();
+        UpdateGoldText();
+        InitLevelButtons();
+        // Add other necessary UI updates here
+    }
+
     private void UpdateGoldText()
     {
         goldText.text = SaveManager.Instance.GetGold().ToString();
@@ -228,7 +252,7 @@ public class MenuManager : MonoBehaviour
     {
         MainMenu,
         Map1Menu,
-        ShopMenu
+        ShopMenu,
+        GameSetting
     }
-
 }

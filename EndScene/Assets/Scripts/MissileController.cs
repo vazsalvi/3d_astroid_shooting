@@ -6,22 +6,23 @@ public class MissileController : MonoBehaviour
 {
     public float moveSpeed = 400f;
     private Rigidbody rb;
-    
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        // Setting velocity directly on the Rigidbody
+        rb.linearVelocity = transform.forward * moveSpeed;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(transform.position.z > AsteroidManager.Instance.asteroidSpawnDistance)
+        // Destroy the missile if it passes a certain z-position
+        if (transform.position.z > AsteroidManager.Instance.asteroidSpawnDistance)
         {
             Destroy(gameObject);
         }
-        rb.linearVelocity = new Vector3(0f, 0f, moveSpeed * Time.deltaTime);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -29,8 +30,7 @@ public class MissileController : MonoBehaviour
         if (other.CompareTag("Asteroid"))
         {
             other.gameObject.GetComponent<AsteroidController>().DestroyAsteroid();
-            Destroy(gameObject);
+            Destroy(gameObject);  // Destroy the missile on collision
         }
     }
-
 }

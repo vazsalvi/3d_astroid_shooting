@@ -14,7 +14,7 @@ public class AsteroidManager : MonoBehaviour
         }
         else
         {
-            Destroy(this);
+            Destroy(gameObject);
         }
     }
     #endregion
@@ -88,7 +88,7 @@ public class AsteroidManager : MonoBehaviour
     private void SpawnNewAsteroid()
     {
         float newX = Random.Range(minX, maxX);
-        float newY = Random.Range(minX, maxY);
+        float newY = Random.Range(minY, maxY);
 
         Vector3 spawPos = new Vector3(newX, newY, asteroidSpawnDistance);
 

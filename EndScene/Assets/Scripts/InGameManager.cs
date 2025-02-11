@@ -17,7 +17,7 @@ public class InGameManager : MonoBehaviour
 
     public Text asteroidKillText;
 
-    public void ChangeHealthbar(int maxHeath, int currentHealth)
+    public void ChangeHealthbar(int maxHealth, int currentHealth)
     {
         if (currentHealth < 0)
             return;
@@ -27,11 +27,11 @@ public class InGameManager : MonoBehaviour
             Invoke("OpenDeathMenu", healthBarChangeTime);
         }
 
-        float healthPct = currentHealth / (float)maxHeath;
-        StartCoroutine(SmootheHealthbarChange(healthPct));
+        float healthPct = currentHealth / (float)maxHealth;
+        StartCoroutine(SmoothHealthbarChange(healthPct));
     }
 
-    private IEnumerator SmootheHealthbarChange(float newFillAmt)
+    private IEnumerator SmoothHealthbarChange(float newFillAmt)
     {
         float elapsed = 0f;
         float oldFillAmt = healthBarFill.fillAmount;
