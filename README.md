@@ -13,6 +13,11 @@ Watch the gameplay demo here:
 
 ---
 
+## 📱 Play Store
+
+🕹️https://play.google.com/store/apps/details?id=com.Asteroids3D.Asteroids
+
+---
 ## 🎮 Game Features
 
 - 🛰️ 3D spaceship control with smooth movement
